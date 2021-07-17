@@ -1,0 +1,9 @@
+﻿body {
+}
+.img-fluid {
+    max-width: 50%;
+    height: auto;
+}
+.jumbotron{
+    background:none;
+}
