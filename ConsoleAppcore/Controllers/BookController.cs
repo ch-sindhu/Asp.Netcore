@@ -1,6 +1,7 @@
 ﻿using ConsoleAppcore.Models;
 using ConsoleAppcore.Repository;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,30 +16,73 @@ namespace ConsoleAppcore.Controllers
         {
             _bookRepository = bookRepository;
         }
-        public ActionResult GetAllBooks()
+        public async Task<ActionResult> GetAllBooks()
         {
-            var data=_bookRepository.GetAllBooks();
+            var data=await _bookRepository.GetAllBooks();
             return View(data);
         }
-        [Route("book-details/{id}")]
-        public ActionResult GetBook(int id)
+        [Route("book-details/{id}",Name="bookDetilsStore")]
+        public async Task<ViewResult> GetBook(int id)
         {
-            var data= _bookRepository.GetBookById(id);
+            var data=await _bookRepository.GetBookById(id);
             return View(data);
         }
         public List<BookModel> SearchBooks(string bookName,string authorName)
         {
             return _bookRepository.SearchBook(bookName,authorName);
         }
-        public ActionResult AddnewBook()
+        public ActionResult AddnewBook(bool isSuccess=false,int bookid=0)
         {
-            return View();
+            var model = new BookModel()
+            {
+                Language = "2"
+            };
+           
+
+            ViewBag.Language = new List<SelectListItem>()
+            {
+                new SelectListItem{Text="Hindi",Value="1"},
+                new SelectListItem{Text="English",Value="2"},
+                new SelectListItem{Text="Telugu",Value="3"},
+                new SelectListItem{Text="Tamil",Value="4"},
+                new SelectListItem{Text="urbu",Value="5"},
+                new SelectListItem{Text="Arabi",Value="6"},
+            };
+            ViewBag.IsSuccess = isSuccess;
+            ViewBag.BookId = bookid;
+            return View(model);
         }
         [HttpPost]
-        public ActionResult AddnewBook(BookModel bookModel)
+        public async Task<IActionResult> AddnewBook(BookModel bookModel)
         {
-            _bookRepository.AddnewBook(bookModel);
+            if(ModelState.IsValid)
+            {
+                int id = await _bookRepository.AddnewBook(bookModel);
+                if (id > 0)
+                {
+                    return RedirectToAction(nameof(AddnewBook), new { isSuccess = true, bookid = id });
+                }
+            }
+            ViewBag.Language = new List<SelectListItem>()
+            {
+                new SelectListItem{Text="Hindi",Value="1"},
+                new SelectListItem{Text="English",Value="2"},
+                new SelectListItem{Text="Telugu",Value="3"},
+                new SelectListItem{Text="Tamil",Value="4"},
+                new SelectListItem{Text="urbu",Value="5"},
+                new SelectListItem{Text="Arabi",Value="6"},
+            };
             return View();
         }
+        private List<LanguageModel> GetLanguage()
+        {
+            return new List<LanguageModel>()
+            {
+                new LanguageModel(){Id=1,Text="Hindi"},
+                new LanguageModel(){Id=1,Text="Hindi"},
+                new LanguageModel(){Id=1,Text="Hindi"},
+            };
+        }
+
     }
 }
