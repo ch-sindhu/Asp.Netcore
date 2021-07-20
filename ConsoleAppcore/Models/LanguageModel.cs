@@ -7,7 +7,8 @@ namespace ConsoleAppcore.Models
 {
     public class LanguageModel
     {
-        public int Id { set; get; }
-        public string Text { set; get; }
+        public int id { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
     }
 }

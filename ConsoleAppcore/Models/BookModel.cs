@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
+using ConsoleAppcore.Enums;
+using Microsoft.AspNetCore.Http;
 
 namespace ConsoleAppcore.Models
 {
@@ -18,12 +20,16 @@ namespace ConsoleAppcore.Models
         public string Author { get; set; }
         public  string Description { get; set; }
         public string Category { get; set; }
-        [Required(ErrorMessage ="PLEASE choose the language of your book")]
-        public string Language { get; set; }
-        [Required(ErrorMessage = "PLEASE choose the language of your book")]
-        public List<string> MultiLanguage { get; set; }
+        //[Required(ErrorMessage ="PLEASE choose the language of your book")]
+        public int LanguageId { get; set; }
+        public string Language { set; get; }
+        //[Required(ErrorMessage = "PLEASE choose the language of your book")]
+        //public LanguageEnum LanguageEnum { get; set; }
 
         [Required(ErrorMessage = "please enter the total pages")]
         public int? TotalPages { get; set; }
+        [Display(Name ="Choose the cover photo of your book")]
+        [Required]
+        public IFormFile Coverphoto { get; set; }
     }
 }

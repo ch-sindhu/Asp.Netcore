@@ -34,8 +34,14 @@ namespace ConsoleAppcore
 #if DEBUG
 
             services.AddRazorPages().AddRazorRuntimeCompilation();
+                 // for client side validations
+                //.AddViewOptions(option =>
+                //{
+                //    option.HtmlHelperOptions.ClientValidationEnabled = false;
+                //});
 #endif
             services.AddScoped<BookRepository, BookRepository>();
+            services.AddScoped<LanguageRepository, LanguageRepository>();
         }
         public void Configure(IApplicationBuilder app,IWebHostEnvironment env)
         {

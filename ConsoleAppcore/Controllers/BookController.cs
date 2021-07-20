@@ -1,5 +1,6 @@
 ﻿using ConsoleAppcore.Models;
 using ConsoleAppcore.Repository;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
@@ -12,9 +13,13 @@ namespace ConsoleAppcore.Controllers
     public class BookController : Controller
     {
         private readonly BookRepository  _bookRepository = null;
-        public BookController(BookRepository bookRepository)
+        private readonly LanguageRepository _languageRepository = null;
+        private readonly IWebHostEnvironment _webHostEnvironment = null;
+        public BookController(BookRepository bookRepository, LanguageRepository languageRepository, IWebHostEnvironment webHostEnvironment)
         {
             _bookRepository = bookRepository;
+            _languageRepository = languageRepository;
+            _webHostEnvironment = webHostEnvironment;
         }
         public async Task<ActionResult> GetAllBooks()
         {
@@ -31,23 +36,15 @@ namespace ConsoleAppcore.Controllers
         {
             return _bookRepository.SearchBook(bookName,authorName);
         }
-        public ActionResult AddnewBook(bool isSuccess=false,int bookid=0)
+        public async Task<ActionResult> AddnewBook(bool isSuccess=false,int bookid=0)
         {
             var model = new BookModel()
             {
-                Language = "2"
+                //Language = "2"
             };
-           
 
-            ViewBag.Language = new List<SelectListItem>()
-            {
-                new SelectListItem{Text="Hindi",Value="1"},
-                new SelectListItem{Text="English",Value="2"},
-                new SelectListItem{Text="Telugu",Value="3"},
-                new SelectListItem{Text="Tamil",Value="4"},
-                new SelectListItem{Text="urbu",Value="5"},
-                new SelectListItem{Text="Arabi",Value="6"},
-            };
+            var languages =new SelectList(await _languageRepository.GetLanguages(),"Id","Name");
+           
             ViewBag.IsSuccess = isSuccess;
             ViewBag.BookId = bookid;
             return View(model);
@@ -57,32 +54,21 @@ namespace ConsoleAppcore.Controllers
         {
             if(ModelState.IsValid)
             {
+                if(bookModel.Coverphoto!=null)
+                {
+                    string folder = "Books/cover";
+                }
+                    
                 int id = await _bookRepository.AddnewBook(bookModel);
                 if (id > 0)
                 {
                     return RedirectToAction(nameof(AddnewBook), new { isSuccess = true, bookid = id });
                 }
             }
-            ViewBag.Language = new List<SelectListItem>()
-            {
-                new SelectListItem{Text="Hindi",Value="1"},
-                new SelectListItem{Text="English",Value="2"},
-                new SelectListItem{Text="Telugu",Value="3"},
-                new SelectListItem{Text="Tamil",Value="4"},
-                new SelectListItem{Text="urbu",Value="5"},
-                new SelectListItem{Text="Arabi",Value="6"},
-            };
+            var languages = new SelectList(await _languageRepository.GetLanguages(), "Id", "Name");
             return View();
         }
-        private List<LanguageModel> GetLanguage()
-        {
-            return new List<LanguageModel>()
-            {
-                new LanguageModel(){Id=1,Text="Hindi"},
-                new LanguageModel(){Id=1,Text="Hindi"},
-                new LanguageModel(){Id=1,Text="Hindi"},
-            };
-        }
+     
 
     }
 }

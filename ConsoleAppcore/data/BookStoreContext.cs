@@ -13,6 +13,6 @@ namespace ConsoleAppcore.data
 
         }
         public DbSet<Books> Books { get; set; }
-       
+       public DbSet<Language> Language { get; set; }
     }
 }
