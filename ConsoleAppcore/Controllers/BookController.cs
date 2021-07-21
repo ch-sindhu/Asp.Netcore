@@ -1,10 +1,12 @@
 ﻿using ConsoleAppcore.Models;
 using ConsoleAppcore.Repository;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -56,9 +58,34 @@ namespace ConsoleAppcore.Controllers
             {
                 if(bookModel.Coverphoto!=null)
                 {
-                    string folder = "Books/cover";
+                    string folder = "Books/cover/";
+                   bookModel.CoverImageUrl=await UploadImage(folder,bookModel.Coverphoto);
                 }
+                if (bookModel.GalleryFiles != null)
+                {
+                    string folder = "Books/gallery/";
+                    bookModel.Gallery = new List<GalleryModel>();
+
+                    foreach(var file in bookModel.GalleryFiles)
+                    {
+                        var gallery = new GalleryModel()
+                        {
+                            Name=file.FileName,
+                            URL = await UploadImage(folder, file)
+
+
+
+                         };
+                        bookModel.Gallery.Add(gallery);
+                    }
                     
+                }
+                if (bookModel.BookPdf != null)
+                {
+                    string folder = "Books/pdf/";
+                    bookModel.BookPdfUrl = await UploadImage(folder, bookModel.BookPdf);
+                }
+
                 int id = await _bookRepository.AddnewBook(bookModel);
                 if (id > 0)
                 {
@@ -68,7 +95,16 @@ namespace ConsoleAppcore.Controllers
             var languages = new SelectList(await _languageRepository.GetLanguages(), "Id", "Name");
             return View();
         }
-     
+
+        private async Task<string> UploadImage(string folderpath,IFormFile file)
+        {
+           
+            folderpath += Guid.NewGuid().ToString() + "_" + file.FileName;
+            
+            string serverfolder = Path.Combine(_webHostEnvironment.WebRootPath, folderpath);
+            await file.CopyToAsync(new FileStream(serverfolder, FileMode.Create));
+            return "/" + folderpath;
+        }
 
     }
 }

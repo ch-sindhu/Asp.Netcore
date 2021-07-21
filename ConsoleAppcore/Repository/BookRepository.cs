@@ -16,22 +16,36 @@ namespace ConsoleAppcore.Repository
         {
             _context = context;
         }
-       public async Task<int> AddnewBook(BookModel model)
+        public async Task<int> AddnewBook(BookModel model)
         {
             var newbook = new Books()
             {
-                Author=model.Author,
-                CreatedOn=DateTime.UtcNow,
-                Description=model.Description,
-                Title=model.Title,
-                LanguageId=model.LanguageId,
-                
-                TotalPages = model.TotalPages.HasValue?model.TotalPages.Value:0,
-                UpdatedOn=DateTime.UtcNow
+                Author = model.Author,
+                CreatedOn = DateTime.UtcNow,
+                Description = model.Description,
+                Title = model.Title,
+                LanguageId = model.LanguageId,
+                TotalPages = model.TotalPages.HasValue ? model.TotalPages.Value : 0,
+                UpdatedOn = DateTime.UtcNow,
+                CoverImageUrl = model.CoverImageUrl,
+                BookPdfUrl=model.BookPdfUrl
+             
             };
-            await  _context.Books.AddAsync(newbook);
-            await  _context.SaveChangesAsync();
-            return newbook.Id; 
+            newbook.bookGallery = new List<BookGallery>();
+            foreach(var file in model.Gallery)
+            {
+                newbook.bookGallery.Add(new BookGallery()
+                {
+                    Name=file.Name,
+                    URL=file.URL
+                });
+
+            }
+
+
+            await _context.Books.AddAsync(newbook);
+            await _context.SaveChangesAsync();
+            return newbook.Id;
         }
         public async Task<List<BookModel>> GetAllBooks()
         {
@@ -46,14 +60,10 @@ namespace ConsoleAppcore.Repository
                 Language = book.Language.Name,
                 Title = book.Title,
                 TotalPages = book.TotalPages,
+                CoverImageUrl = book.CoverImageUrl
             }).ToListAsync();
-               
-
-                    
-                
-            
-            
         }
+    
         public async Task<BookModel> GetBookById(int id)
         {
 
@@ -67,6 +77,16 @@ namespace ConsoleAppcore.Repository
                 Language = book.Language.Name,
                 Title = book.Title,
                 TotalPages = book.TotalPages,
+                CoverImageUrl = book.CoverImageUrl,
+                Gallery = book.bookGallery.Select(g => new GalleryModel()
+                {
+                    id=g.Id,
+                    Name=g.Name,
+                    URL=g.URL
+
+                }).ToList(),
+                BookPdfUrl=book.BookPdfUrl
+
 
             }).FirstOrDefaultAsync();
            
