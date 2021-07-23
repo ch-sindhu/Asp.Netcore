@@ -15,21 +15,26 @@ using System.IO;
 using ConsoleAppcore.data;
 using Microsoft.EntityFrameworkCore;
 using ConsoleAppcore.Repository;
+using ConsoleAppcore.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace ConsoleAppcore
 {
     public class Startup
     {
+        private readonly IConfiguration _configuration;
         public Startup(IConfiguration configuration)
         {
-            Configuration = configuration;
+            _configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
+       
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<BookStoreContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<BookStoreContext>(options => options.UseSqlServer(_configuration.GetConnectionString("DefaultConnection")));
+            services.AddIdentity<IdentityUser, IdentityRole>()
+                .AddEntityFrameworkStores<BookStoreContext>();
             services.AddControllersWithViews();
 #if DEBUG
 
@@ -40,8 +45,11 @@ namespace ConsoleAppcore
                 //    option.HtmlHelperOptions.ClientValidationEnabled = false;
                 //});
 #endif
-            services.AddScoped<BookRepository, BookRepository>();
-            services.AddScoped<LanguageRepository, LanguageRepository>();
+            services.AddScoped<IBookRepository, BookRepository>();
+            services.AddScoped<ILanguageRepository, LanguageRepository>();
+            services.AddSingleton<IMessageRepository, MessageRepository>();
+            services.Configure<NewBookAlertConfig>("Internal book",_configuration.GetSection("NewBookAlert"));
+            services.Configure<NewBookAlertConfig>("ThirdPartyBook", _configuration.GetSection("ThirdPartyBook"));
         }
         public void Configure(IApplicationBuilder app,IWebHostEnvironment env)
         {
@@ -62,6 +70,7 @@ namespace ConsoleAppcore
             //    RequestPath="/MyStaticFiles"
             //}) ;
             app.UseRouting();
+            app.UseAuthentication();
             app.UseCors();
             //app.UseEndpoints(endpoints =>
             //{

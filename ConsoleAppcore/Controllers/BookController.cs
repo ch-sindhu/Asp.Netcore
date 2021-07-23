@@ -12,23 +12,25 @@ using System.Threading.Tasks;
 
 namespace ConsoleAppcore.Controllers
 {
+    [Route("[controller]/[action]")]
     public class BookController : Controller
     {
-        private readonly BookRepository  _bookRepository = null;
-        private readonly LanguageRepository _languageRepository = null;
+        private readonly IBookRepository  _bookRepository = null;
+        private readonly ILanguageRepository _languageRepository = null;
         private readonly IWebHostEnvironment _webHostEnvironment = null;
-        public BookController(BookRepository bookRepository, LanguageRepository languageRepository, IWebHostEnvironment webHostEnvironment)
+        public BookController(IBookRepository bookRepository, ILanguageRepository languageRepository, IWebHostEnvironment webHostEnvironment)
         {
             _bookRepository = bookRepository;
             _languageRepository = languageRepository;
             _webHostEnvironment = webHostEnvironment;
         }
+        [Route("all-books")]
         public async Task<ActionResult> GetAllBooks()
         {
             var data=await _bookRepository.GetAllBooks();
             return View(data);
         }
-        [Route("book-details/{id}",Name="bookDetilsStore")]
+        [Route("~/book-details/{id:int:min(1)}",Name="bookDetilsRoute")]
         public async Task<ViewResult> GetBook(int id)
         {
             var data=await _bookRepository.GetBookById(id);
@@ -45,7 +47,7 @@ namespace ConsoleAppcore.Controllers
                 //Language = "2"
             };
 
-            var languages =new SelectList(await _languageRepository.GetLanguages(),"Id","Name");
+            //var languages =new SelectList(await _languageRepository.GetLanguages(),"Id","Name");
            
             ViewBag.IsSuccess = isSuccess;
             ViewBag.BookId = bookid;
@@ -92,7 +94,7 @@ namespace ConsoleAppcore.Controllers
                     return RedirectToAction(nameof(AddnewBook), new { isSuccess = true, bookid = id });
                 }
             }
-            var languages = new SelectList(await _languageRepository.GetLanguages(), "Id", "Name");
+            //var languages = new SelectList(await _languageRepository.GetLanguages(), "Id", "Name");
             return View();
         }
 
