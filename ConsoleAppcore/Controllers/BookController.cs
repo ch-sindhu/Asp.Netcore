@@ -47,7 +47,7 @@ namespace ConsoleAppcore.Controllers
                 //Language = "2"
             };
 
-            //var languages =new SelectList(await _languageRepository.GetLanguages(),"Id","Name");
+            var languages =new SelectList(await _languageRepository.GetLanguages(),"Id","Name");
            
             ViewBag.IsSuccess = isSuccess;
             ViewBag.BookId = bookid;
