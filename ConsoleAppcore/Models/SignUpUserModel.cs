@@ -8,6 +8,9 @@ namespace ConsoleAppcore.Models
 {
     public class SignUpUserModel
     {
+        [Required(ErrorMessage = "Please enter your FirstName")]
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
         [Required(ErrorMessage ="Please enter your Email")]
         [Display(Name ="Email Address")]
         [EmailAddress(ErrorMessage ="please enter a valid email")]

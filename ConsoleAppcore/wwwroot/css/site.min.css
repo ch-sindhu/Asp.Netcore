@@ -1,0 +1,14 @@
+@import url('file:///C:\Users\Sriman\source\repos\ConsoleAppcore\ConsoleAppcore\wwwroot\css\Site.css');
+body {
+}
+.img-fluid {
+    max-width: 50%;
+    height: auto;
+}
+.jumbotron{
+    background:none;
+}
+
+.nitish{
+    color:blue;
+}

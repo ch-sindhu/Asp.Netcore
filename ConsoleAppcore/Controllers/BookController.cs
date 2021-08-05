@@ -1,5 +1,6 @@
 ﻿using ConsoleAppcore.Models;
 using ConsoleAppcore.Repository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -40,6 +41,7 @@ namespace ConsoleAppcore.Controllers
         {
             return _bookRepository.SearchBook(bookName,authorName);
         }
+        [Authorize]
         public async Task<ActionResult> AddnewBook(bool isSuccess=false,int bookid=0)
         {
             var model = new BookModel()
